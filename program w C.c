@@ -35,14 +35,17 @@ int main(int argc, char **argv)
         for(int i = 1; i <  argc; i++)
         {
             printf("\nparametr %d-ty to: %s",i, argv[i]);
+            //sprawdzenie, czy wprowadzony parametr odpowiada za rekurencję 
             if(argv[i][0] == '-')
             {
                 if(argv[i][1] == 'R')
                 {
                     rekurencja = true;
                 }
+                //sprawdzenie, czy wprowadzony parametr odpowiada za czas
                 else if(argv[i][1] == 'i')
                 {
+                    //podanie ilości czasu
                     if(i+1 < argc )
                     {
                         czas=atoi(argv[i+1]);
@@ -61,6 +64,7 @@ int main(int argc, char **argv)
                     break;
                 }
             }
+            //przypisanie obecnego i następnego argumentu jako plik źródłowy i docelowy
             else if(i+1<argc)
             {
                 plik_zrodlowy=argv[i];
@@ -78,15 +82,13 @@ int main(int argc, char **argv)
 
 
         }
-        //
     }
+    //gdy parametry niepoprawne wypisujemy w jakiej kolejności mają być podane
     if(!czy_parametry_poprawne)
     {
         printf("\n Parametry niepoprawne");
         printf("\nPoprawne parametry to: ");
         printf("\nsynchronizacja_katalogow plik_zrodlowy plik_docelowy [-i czas(liczba calkowita)] [-R] ");
-
-
         return -1;
     }
     else
@@ -97,8 +99,10 @@ int main(int argc, char **argv)
     //analiza plikow przekazanych do programu
     bool czy_katalogi_poprawne=true;
 
+    //próba otworzenia katalogu wejściowego i wyjściowego
     DIR *katalog_wejsciowy=opendir(plik_zrodlowy);
     DIR *katalog_wyjsciowy=opendir(plik_docelowy);
+    //jeśli katalogi są określone jako nulle lub są niepoprawnie zamykane to znaczy że są niepoprawne/nie są katalogami
     if(katalog_wejsciowy==NULL)
     {
         czy_katalogi_poprawne=false;
@@ -138,6 +142,7 @@ int main(int argc, char **argv)
     {
         printf("Demon dziala i to jak.");
     }
+    //zapisanie informacji w logach systemu
     syslog(LOG_NOTICE, "Daemon started");
 
     sleep(10);
