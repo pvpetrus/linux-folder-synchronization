@@ -190,11 +190,13 @@ void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
            exit(EXIT_FAILURE);
        }
 
+
+        //wykonywanie operacji na katalogach i czekanie
        while(1){
            syslog(LOG_NOTICE, "Demon się budzi! (Buka tu jest)");
-           sleep(czas);
+
            syslog(LOG_NOTICE, "Demon idzie spać! (Buka tu wróci)");
-           
+           sleep(czas);
 
        }
         
