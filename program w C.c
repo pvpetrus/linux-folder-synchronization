@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     //deklaracja zmiennych zaleznych od parametrow
     char *plik_zrodlowy;
     char *plik_docelowy;
-    int czas=300;
+    int czas=300000;
     bool rekurencja=NULL;
     printf(argc+"\n");
     //
@@ -35,17 +35,14 @@ int main(int argc, char **argv)
         for(int i = 1; i <  argc; i++)
         {
             printf("\nparametr %d-ty to: %s",i, argv[i]);
-            //sprawdzenie, czy wprowadzony parametr odpowiada za rekurencję 
             if(argv[i][0] == '-')
             {
                 if(argv[i][1] == 'R')
                 {
                     rekurencja = true;
                 }
-                //sprawdzenie, czy wprowadzony parametr odpowiada za czas
                 else if(argv[i][1] == 'i')
                 {
-                    //podanie ilości czasu
                     if(i+1 < argc )
                     {
                         czas=atoi(argv[i+1]);
@@ -64,7 +61,6 @@ int main(int argc, char **argv)
                     break;
                 }
             }
-            //przypisanie obecnego i następnego argumentu jako plik źródłowy i docelowy
             else if(i+1<argc)
             {
                 plik_zrodlowy=argv[i];
@@ -82,13 +78,15 @@ int main(int argc, char **argv)
 
 
         }
+        //
     }
-    //gdy parametry niepoprawne wypisujemy w jakiej kolejności mają być podane
     if(!czy_parametry_poprawne)
     {
         printf("\n Parametry niepoprawne");
         printf("\nPoprawne parametry to: ");
         printf("\nsynchronizacja_katalogow plik_zrodlowy plik_docelowy [-i czas(liczba calkowita)] [-R] ");
+
+
         return -1;
     }
     else
@@ -99,10 +97,8 @@ int main(int argc, char **argv)
     //analiza plikow przekazanych do programu
     bool czy_katalogi_poprawne=true;
 
-    //próba otworzenia katalogu wejściowego i wyjściowego
     DIR *katalog_wejsciowy=opendir(plik_zrodlowy);
     DIR *katalog_wyjsciowy=opendir(plik_docelowy);
-    //jeśli katalogi są określone jako nulle lub są niepoprawnie zamykane to znaczy że są niepoprawne/nie są katalogami
     if(katalog_wejsciowy==NULL)
     {
         czy_katalogi_poprawne=false;
@@ -138,17 +134,76 @@ int main(int argc, char **argv)
     openlog("Daemon", LOG_PID, LOG_DAEMON);
 
 
-    if(daemon(0,0))
-    {
-        printf("Demon dziala i to jak.");
-    }
-    //zapisanie informacji w logach systemu
-    syslog(LOG_NOTICE, "Daemon started");
+    // if(daemon(0,0))
+    // {
+    //     printf("Demon dziala i to jak.");
+    // }
+    
 
-    sleep(10);
+    //sleep(czas);
 
+   
     syslog(LOG_NOTICE, "Daemon ended work");
     printf("Demon cos tam zrobil");
 
+    
+
     return 0;
+}
+
+void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
+        pid_t pid;
+        pid = fork();
+        if(pid==-1){
+            return -1;
+        }
+        else if (pid !=0){
+            exit(EXIT_SUCCESS);
+        }
+
+        /* stwórz nową sesję i grupę procesów */
+        if (setsid ( ) == -1){
+        return -1;
+        }
+
+        /* ustaw katalog roboczy na katalog główny */
+        if (chdir ("/") == -1){
+        return -1;
+        }
+
+        /* zamknij wszystkie pliki otwarte - użycie opcji NR_OPEN to przesada, lecz działa */
+        for (i = 0; i < NR_OPEN; i++){
+            close (i);
+        }
+
+        /* przeadresuj deskryptory plików 0, 1, 2 na /dev/null */
+        open ("/dev/null", O_RDWR); /* stdin */
+        dup (0); /* stdout */
+        dup (0); /* stderror */
+
+        /* tu należy wykonać czynności demona… */
+        
+        //sprawdzenie czy program powinien natychmiastowo obudzić demona
+        
+       if(signal(SIGINT, powiadamiam)==SIG_ERR){
+           syslog(LOG_ERR,"Błąd związany z wysyłaniem sygnału");
+           exit(EXIT_FAILURE);
+       }
+
+
+        //wykonywanie operacji na katalogach i czekanie
+       while(1){
+           syslog(LOG_NOTICE, "Demon się budzi! (Buka tu jest)");
+
+           syslog(LOG_NOTICE, "Demon idzie spać! (Buka tu wróci)");
+           sleep(czas);
+
+       }
+        
+
+    }
+
+void powiadamiam(int sig)
+{
+    syslog(LOG_NOTICE, "Żądanie natychmiastowgo wybudzenia demona (SIGUSR1)");
 }
