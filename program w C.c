@@ -172,7 +172,7 @@ void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
         }
 
         /* zamknij wszystkie pliki otwarte - użycie opcji NR_OPEN to przesada, lecz działa */
-        for (i = 0; i < NR_OPEN; i++){
+        for (int i = 0; i < NR_OPEN; i++){
             close (i);
         }
 
