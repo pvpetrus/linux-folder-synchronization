@@ -105,7 +105,7 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
     // przejscie po wszystkich plikach i folderach w folderze wyjsciowym
     while(plik_tymczasowy_docelowy=readdir(sciezka_pliku_docelowego))
     {
-        if(strcmp(plik_tymczasowy_docelowy->d_name,readdir(sciezka_pliku_tymczasowego))==0)
+        if(strcmp(plik_tymczasowy_docelowy->d_name,sciezka_pliku_tymczasowego)==0)
         {
             if((plik_tymczasowy_docelowy->d_type)==DT_REG)
             {
@@ -182,8 +182,9 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
         if((pliktymczasowy->d_type) == DT_REG)
         {
             syslog(LOG_NOTICE, "znaleziono plik");
-            sciezka_pliku = plik_na_sciezke(zrodlowa, pliktymczasowy->d_name);
-            if(sprawdz_plik_zrodlowy(pliktymczasowy,docelowa)==false)
+
+            sciezka_pliku = plik_na_sciezke(zrodlowa, (pliktymczasowy->d_name));
+            if(sprawdz_plik_zrodlowy(pliktymczasowy->d_name,docelowa)==false)
             {
                 syslog(LOG_NOTICE, "Należy skopiować plik");
                 //brakuje pliku i trzeba go skopiowac
