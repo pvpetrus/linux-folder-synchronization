@@ -14,6 +14,63 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+void powiadamiam(int sig)
+{
+    syslog(LOG_NOTICE, "Żądanie natychmiastowgo wybudzenia demona (SIGUSR1)");
+}
+
+void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
+        pid_t pid;
+        pid = fork();
+        if(pid==-1){
+            return -1;
+        }
+        else if (pid !=0){
+            exit(EXIT_SUCCESS);
+        }
+
+        /* stwórz nową sesję i grupę procesów */
+        if (setsid ( ) == -1){
+        return -1;
+        }
+
+        /* ustaw katalog roboczy na katalog główny */
+        if (chdir ("/") == -1){
+        return -1;
+        }
+
+        /* zamknij wszystkie pliki otwarte - użycie opcji NR_OPEN to przesada, lecz działa */
+        close(STDIN_FILENO);
+        close(STDOUT_FILENO);
+        close(STDERR_FILENO);
+
+        /* przeadresuj deskryptory plików 0, 1, 2 na /dev/null */
+        open ("/dev/null", O_RDWR); /* stdin */
+        dup (0); /* stdout */
+        dup (0); /* stderror */
+
+        /* tu należy wykonać czynności demona… */
+        
+        //sprawdzenie czy program powinien natychmiastowo obudzić demona
+        
+       if(signal(SIGINT, powiadamiam)==SIG_ERR){
+           syslog(LOG_ERR,"Błąd związany z wysyłaniem sygnału");
+           exit(EXIT_FAILURE);
+       }
+
+
+        //wykonywanie operacji na katalogach i czekanie
+       while(1){
+           syslog(LOG_NOTICE, "Demon się budzi! (Buka tu jest)");
+
+           syslog(LOG_NOTICE, "Demon idzie spać! (Buka tu wróci)");
+           sleep(czas);
+
+       }
+        
+
+    }
+
 int main(int argc, char **argv)
 {
     //deklaracja zmiennych zaleznych od parametrow
@@ -21,12 +78,12 @@ int main(int argc, char **argv)
     char *plik_docelowy;
     int czas=300000;
     bool rekurencja=NULL;
-    printf(argc+"\n");
+    printf("%d\n", argc);
     //
     //kod na sprawdzenie parametrow
     bool czy_parametry_poprawne=true;
 
-    if(argc<=1 || argc>6) {
+    if(argc<=2 || argc>6) {
         czy_parametry_poprawne = false;
         printf("\nzla liczba parametrow");
     }
@@ -142,6 +199,9 @@ int main(int argc, char **argv)
 
     //sleep(czas);
 
+
+    ourDemon(plik_zrodlowy, plik_docelowy, czas, rekurencja);
+
    
     syslog(LOG_NOTICE, "Daemon ended work");
     printf("Demon cos tam zrobil");
@@ -151,59 +211,5 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
-        pid_t pid;
-        pid = fork();
-        if(pid==-1){
-            return -1;
-        }
-        else if (pid !=0){
-            exit(EXIT_SUCCESS);
-        }
-
-        /* stwórz nową sesję i grupę procesów */
-        if (setsid ( ) == -1){
-        return -1;
-        }
-
-        /* ustaw katalog roboczy na katalog główny */
-        if (chdir ("/") == -1){
-        return -1;
-        }
-
-        /* zamknij wszystkie pliki otwarte - użycie opcji NR_OPEN to przesada, lecz działa */
-        for (int i = 0; i < NR_OPEN; i++){
-            close (i);
-        }
-
-        /* przeadresuj deskryptory plików 0, 1, 2 na /dev/null */
-        open ("/dev/null", O_RDWR); /* stdin */
-        dup (0); /* stdout */
-        dup (0); /* stderror */
-
-        /* tu należy wykonać czynności demona… */
-        
-        //sprawdzenie czy program powinien natychmiastowo obudzić demona
-        
-       if(signal(SIGINT, powiadamiam)==SIG_ERR){
-           syslog(LOG_ERR,"Błąd związany z wysyłaniem sygnału");
-           exit(EXIT_FAILURE);
-       }
 
 
-        //wykonywanie operacji na katalogach i czekanie
-       while(1){
-           syslog(LOG_NOTICE, "Demon się budzi! (Buka tu jest)");
-
-           syslog(LOG_NOTICE, "Demon idzie spać! (Buka tu wróci)");
-           sleep(czas);
-
-       }
-        
-
-    }
-
-void powiadamiam(int sig)
-{
-    syslog(LOG_NOTICE, "Żądanie natychmiastowgo wybudzenia demona (SIGUSR1)");
-}
