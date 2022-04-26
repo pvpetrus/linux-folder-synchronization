@@ -72,7 +72,7 @@ void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
 
 char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy_nazwa)
 {
-    
+
     char* sciezka_pliku = malloc(strlen(sciezka_zrodlowa) + strlen(plik_tymczasowy_nazwa) + 2 );
     strcpy(sciezka_pliku,sciezka_zrodlowa);
     strcat(sciezka_pliku,"/");
@@ -85,7 +85,12 @@ char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy_nazwa)
 time_t data_modyfikacji(char * pliczek)
 {
     struct stat czas;
-    stat(pliczek, &czas);
+    syslog(LOG_NOTICE,"data modyfikacji");
+    if(stat(pliczek, &czas) == -1)
+    {
+        syslog(LOG_ERR, "Blad z pobraniem daty modyfikacji dla pliku");
+        exit(EXIT_FAILURE);
+    }
     return czas.st_mtime;
 }
 
@@ -178,12 +183,12 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
         {
             syslog(LOG_NOTICE, "znaleziono plik");
             sciezka_pliku = plik_na_sciezke(sciezka_zrodlowa, pliktymczasowy);
-        if(sprawdz_plik_zrodlowy(pliktymczasowy,sciezka_docelowa)==false)
-        {
-            syslog(LOG_NOTICE, "Należy skopiować plik");
-            //brakuje pliku i trzeba go skopiowac
-            kopiuj_plik(sciezka_pliku,plik_na_sciezke(sciezka_docelowa, pliktymczasowy->d_name));
-        }
+            if(sprawdz_plik_zrodlowy(pliktymczasowy,sciezka_docelowa)==false)
+            {
+                syslog(LOG_NOTICE, "Należy skopiować plik");
+                //brakuje pliku i trzeba go skopiowac
+                kopiuj_plik(sciezka_pliku,plik_na_sciezke(sciezka_docelowa, pliktymczasowy->d_name));
+            }
         
         }
         else
