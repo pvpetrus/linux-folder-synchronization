@@ -221,10 +221,10 @@ int kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
 
 void modyfikacja_czasu_i_dostepu(char * plik_wejsciowy, char* plik_wyjsciowy)
 {
-    struct utimbuf czas;
-    czas.actime=0;
-    czas.modtime=data_modyfikacji(plik_wejsciowy);
-    if(utime(plik_wyjsciowy, &czas) != 0)
+    struct utimbuf czas_modyfikacji=NULL;
+    czas_modyfikacji.actime=0;
+    czas_modyfikacji.modtime=data_modyfikacji(plik_wejsciowy);
+    if(utime(plik_wyjsciowy, &czas_modyfikacji) != 0)
     {
         syslog(LOG_ERR, "nie mozna ustawic daty");
         exit(EXIT_FAILURE);
