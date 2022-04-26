@@ -28,7 +28,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
     printf("porownaj_zrodlowy");
     syslog(LOG_NOTICE, "zrodlowa: %s", zrodlowa);
 
-    char actualpath [PATH_MAX+1];
+    char* actualpath =malloc(sizeof(char) * PATH_MAX);
     char * ptr = realpath(zrodlowa, actualpath);
     DIR* sciezka_zrodlowa = opendir(ptr);
 
