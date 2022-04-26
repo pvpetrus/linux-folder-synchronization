@@ -183,7 +183,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
         {
             syslog(LOG_NOTICE, "znaleziono plik");
             sciezka_pliku = plik_na_sciezke(zrodlowa, pliktymczasowy->d_name);
-            if(sprawdz_plik_zrodlowy(pliktymczasowy,sciezka_docelowa)==false)
+            if(sprawdz_plik_zrodlowy(pliktymczasowy,docelowa)==false)
             {
                 syslog(LOG_NOTICE, "Należy skopiować plik");
                 //brakuje pliku i trzeba go skopiowac
