@@ -81,11 +81,45 @@ char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy)
     
 }
 
-bool sprawdz_plik_zrodlowy(char* sciezka_pliku, char* sciezka_docelowa)
+time_t data_modyfikacji(char * pliczek)
+{
+    struct stat czas;
+    stat(pliczek, &czas);
+    return czas.st_mtime;
+}
+
+bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docelowa)
 {
     bool czy_istnieje = false;
-    DIR* sciezka_pliku_docelowego;
-    
+    DIR* sciezka_pliku_docelowego=opendir(sciezka_docelowa);
+    struct dirent* plik_tymczasowy_docelowy;
+
+    int roznica_czasu=0;
+
+    while(plik_tymczasowy_docelowy=readdir(sciezka_pliku_docelowego))
+    {
+        if(strcmp(plik->d_name,readdir(sciezka_pliku_tymczasowego))==0)
+        {
+            if((plik->d_Type)==DT_REG)
+            {
+                roznica_czasu=(int)data_modyfikacji(sciezka_pliku_tymczasowego)-
+                (int)data_modyfikacji(plik_na_sciezke(sciezka_docelowa, 
+                plik_tymczasowy_docelowy));
+                if(roznica_czasu==0){
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                //jesli plik jest dowiazaniem lub folderem nie robimy nic
+                return 0;
+            }
+        }
+    }
 }
 
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
@@ -98,16 +132,20 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
 
      while(pliktymczasowy=readdir(sciezka_zrodlowa))
      {
-         if(pliktymczasowy->d_type == DT_DIR)
+         if((pliktymczasowy->d_type) == DT_REG)
          {
-            //rekurencja
+             sciezka_pliku = plik_na_sciezke(sciezka_zrodlowa, pliktymczasowy);
+            if(sprawdz_plik_zrodlowy(pliktymczasowy,sciezka_docelowa)==false)
+            {
+                //brakuje pliku i trzeba go skopiowac
+                kopiuj_plik();
+            }
+            
          }
          else
          {
-            sciezka_pliku = plik_na_sciezke(sciezka_zrodlowa, pliktymczasowy);
-            if()
-                  
-
+           //rekurencja
+           //jesli plik jest folderem lub dowiazaniem nie robimy nic
          }
      }
 }
@@ -251,6 +289,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-
-
-
