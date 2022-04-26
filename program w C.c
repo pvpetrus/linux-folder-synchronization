@@ -182,7 +182,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
         if((pliktymczasowy->d_type) == DT_REG)
         {
             syslog(LOG_NOTICE, "znaleziono plik");
-            sciezka_pliku = plik_na_sciezke(sciezka_zrodlowa, pliktymczasowy);
+            sciezka_pliku = plik_na_sciezke(zrodlowa, pliktymczasowy->d_name);
             if(sprawdz_plik_zrodlowy(pliktymczasowy,sciezka_docelowa)==false)
             {
                 syslog(LOG_NOTICE, "Należy skopiować plik");
