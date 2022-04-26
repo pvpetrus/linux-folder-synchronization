@@ -62,7 +62,6 @@ void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
     //wykonywanie operacji na katalogach i czekanie
     while(1){
         syslog(LOG_NOTICE, "Demon się budzi! (Buka tu jest)");
-        syslog(LOG_NOTICE, "XYZ");
         porownaj_zrodlowy(plik_zr, plik_doc);
         syslog(LOG_NOTICE, "Demon idzie spać! (Buka tu wróci)");
         sleep(czas);
@@ -96,7 +95,7 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
     struct dirent* plik_tymczasowy_docelowy;
 
     int roznica_czasu=0;
-
+    // przejscie po wszystkich plikach i folderach w folderze wyjsciowym
     while(plik_tymczasowy_docelowy=readdir(sciezka_pliku_docelowego))
     {
         if(strcmp(plik_tymczasowy_docelowy->d_name,readdir(sciezka_pliku_tymczasowego))==0)
@@ -106,6 +105,7 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
                 roznica_czasu=(int)data_modyfikacji(sciezka_pliku_tymczasowego)-
                 (int)data_modyfikacji(plik_na_sciezke(sciezka_docelowa, 
                 plik_tymczasowy_docelowy));
+                //jesli data modyfikacji plikow rozni sie to nalezy plik docelowy zamienic
                 if(roznica_czasu==0){
                     return true;
                 }
@@ -127,6 +127,8 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
 
 void kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
 {
+    //kopiowanie pliku jesli plik docelowy lub zamiana jesli plik juz istnieje
+    printf("kopiuj_plik");
     unsigned int rozmiar_bufora=32;
     FILE *plik_wejsciowy=fopen(plik_zrodlowy,"rb");
 	if(plik_wejsciowy==NULL)
@@ -153,38 +155,40 @@ void kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
 	fclose(plik_wejsciowy);
 	fclose(plik_wyjsciowy);
 
-    syslog(LOG_INFO, "Zmodyfikowano/utworzono plik");
+    syslog(LOG_NOTICE, "Zmodyfikowano/utworzono plik");
     //dodac zmiane czasu i date modyfikacji zeby byla taka sama ale nie terazniejsza
     
 }
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
 {
-    syslog(LOG_INFO, "Poczatek porownannia");
-     DIR* sciezka_zrodlowa = opendir(zrodlowa);
-     DIR* sciezka_docelowa = opendir(docelowa);
+    syslog(LOG_NOTICE, "Poczatek porownania");
+    printf("porownaj_zrodlowy");
 
-     struct dirent* pliktymczasowy;
-     char* sciezka_pliku;
+    DIR* sciezka_zrodlowa = opendir(zrodlowa);
+    DIR* sciezka_docelowa = opendir(docelowa);
 
-     while(pliktymczasowy=readdir(sciezka_zrodlowa))
-     {
-         if((pliktymczasowy->d_type) == DT_REG)
-         {
-             sciezka_pliku = plik_na_sciezke(sciezka_zrodlowa, pliktymczasowy);
-            if(sprawdz_plik_zrodlowy(pliktymczasowy,sciezka_docelowa)==false)
-            {
-                syslog(LOG_INFO, "Należy skopiować plik");
-                //brakuje pliku i trzeba go skopiowac
-                kopiuj_plik(sciezka_pliku,plik_na_sciezke(sciezka_docelowa, pliktymczasowy->d_name));
-            }
-            
-         }
-         else
-         {
-           //rekurencja
-           //jesli plik jest folderem lub dowiazaniem nie robimy nic
-         }
-     }
+    struct dirent* pliktymczasowy;
+    char* sciezka_pliku;
+    // przejscie po wszystkich plikach i folderach w folderze wejsciowym
+    while(pliktymczasowy=readdir(sciezka_zrodlowa))
+    {
+        if((pliktymczasowy->d_type) == DT_REG)
+        {
+            sciezka_pliku = plik_na_sciezke(sciezka_zrodlowa, pliktymczasowy);
+        if(sprawdz_plik_zrodlowy(pliktymczasowy,sciezka_docelowa)==false)
+        {
+            syslog(LOG_NOTICE, "Należy skopiować plik");
+            //brakuje pliku i trzeba go skopiowac
+            kopiuj_plik(sciezka_pliku,plik_na_sciezke(sciezka_docelowa, pliktymczasowy->d_name));
+        }
+        
+        }
+        else
+        {
+        //rekurencja
+        //jesli plik jest folderem lub dowiazaniem nie robimy nic
+        }
+    }
 }
 
 int main(int argc, char **argv)
@@ -194,7 +198,6 @@ int main(int argc, char **argv)
     char *plik_docelowy;
     int czas=300000;
     bool rekurencja=NULL;
-    printf("%d\n", argc);
     //
     //kod na sprawdzenie parametrow
     bool czy_parametry_poprawne=true;
@@ -303,13 +306,13 @@ int main(int argc, char **argv)
 
     //jesli wszystkie parametry i pliki sie zgadzaja mozna wlaczyc demona
 
-    //przywolanie demona
+    //utworzenie logu o nazwie Daemon
     openlog("Daemon", LOG_PID, LOG_DAEMON);
 
-
+    syslog(LOG_NOTICE,"DAEMON started work");
+    //przywolanie demona
     ourDemon(plik_zrodlowy, plik_docelowy, czas, rekurencja);
 
-   
     syslog(LOG_NOTICE, "Daemon ended work");
     printf("Demon cos tam zrobil");
 
