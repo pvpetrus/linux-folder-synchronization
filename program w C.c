@@ -20,7 +20,7 @@ int ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja);
 char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy_nazwa);
 time_t data_modyfikacji(char * pliczek);
 bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docelowa);
-void kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy);
+int kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy);
 
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
 {
