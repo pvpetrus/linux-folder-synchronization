@@ -72,7 +72,7 @@ void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
 
 char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy_nazwa)
 {
-
+    syslog(LOG_NOTICE, "zamiana pliku na sciezke");
     char* sciezka_pliku = malloc(strlen(sciezka_zrodlowa) + strlen(plik_tymczasowy_nazwa) + 2 );
     strcpy(sciezka_pliku,sciezka_zrodlowa);
     strcat(sciezka_pliku,"/");
@@ -193,6 +193,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
         }
         else
         {
+            syslog(LOG_NOTICE, "ni znaleziono pliku");
         //rekurencja
         //jesli plik jest folderem lub dowiazaniem nie robimy nic
         }
