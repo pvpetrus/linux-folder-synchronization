@@ -111,7 +111,7 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
             {
                 roznica_czasu=(int)data_modyfikacji(sciezka_pliku_tymczasowego)-
                 (int)data_modyfikacji(plik_na_sciezke(sciezka_docelowa, 
-                plik_tymczasowy_docelowy));
+                plik_tymczasowy_docelowy->d_name));
                 //jesli data modyfikacji plikow rozni sie to nalezy plik docelowy zamienic
                 if(roznica_czasu==0){
                     return true;
