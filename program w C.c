@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+void modyfikacja_czasu_i_dostepu(char * plik_wejsciowy, char* plik_wyjsciowy);
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa);
 void powiadamiam(int sig);
 int ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja);
@@ -31,6 +32,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
     DIR* sciezka_zrodlowa = opendir(zrodlowa);
     syslog(LOG_NOTICE,"sciezka_docelu: %s", docelowa);
     DIR* sciezka_docelowa = opendir(docelowa);
+    //tu trzeba dac pobieranie pelnej sciezki bo inaczej jest dziadostwo ^^^^^^^ ale dziaa
 
     struct dirent* pliktymczasowy;
     char* sciezka_pliku;
@@ -212,10 +214,33 @@ int kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
 	fclose(plik_wyjsciowy);
 
     syslog(LOG_NOTICE, "Zmodyfikowano/utworzono plik");
-    //dodac zmiane czasu i date modyfikacji zeby byla taka sama ale nie terazniejsza
+    //dodac zmiane daty modyfikacji i dostepu zeby byla taka sama ale nie terazniejsza
+    modyfikacja_czasu_i_dostepu(plik_zrodlowy,plik_docelowy);
     
 }
 
+void modyfikacja_czasu_i_dostepu(char * plik_wejsciowy, char* plik_wyjsciowy)
+{
+    struct utimbuf czas;
+    czas.actime=0;
+    czas.modtime=data_modyfikacji(plik_wejsciowy);
+    if(utime(plik_wyjsciowy, &czas) != 0)
+    {
+        syslog(LOG_ERR, "nie mozna ustawic daty");
+        exit(EXIT_FAILURE);
+    }
+    struct stat uprawnienia_modyfikacji;
+    if(stat(plik_wejsciowy,&uprawnienia_modyfikacji)==-1){
+        syslog(LOG_ERR, "Nie mozna pobrac uprawnien")
+    }
+
+
+    if(chmod(plik_wyjsciowy, uprawnienia_modyfikacji.st_mode)!=0)
+    {
+        syslog(LOG_ERR, "nie mozna ustawic uprawnien");
+        exit(EXIT_FAILURE);
+    }
+}
 
 int main(int argc, char **argv)
 {
