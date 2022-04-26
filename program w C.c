@@ -20,56 +20,97 @@ void powiadamiam(int sig)
 }
 
 void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
-        pid_t pid;
-        pid = fork();
-        if(pid==-1){
-            return -1;
-        }
-        else if (pid !=0){
-            exit(EXIT_SUCCESS);
-        }
+    pid_t pid;
+    pid = fork();
+    if(pid==-1){
+         return -1;
+    }
+    else if (pid !=0){
+        exit(EXIT_SUCCESS);
+    }
 
-        /* stwórz nową sesję i grupę procesów */
-        if (setsid ( ) == -1){
-        return -1;
-        }
+    /* stwórz nową sesję i grupę procesów */
+    if (setsid ( ) == -1){
+    return -1;
+    }
 
-        /* ustaw katalog roboczy na katalog główny */
-        if (chdir ("/") == -1){
-        return -1;
-        }
+    /* ustaw katalog roboczy na katalog główny */
+    if (chdir ("/") == -1){
+    return -1;
+    }
 
-        /* zamknij wszystkie pliki otwarte - użycie opcji NR_OPEN to przesada, lecz działa */
-        close(STDIN_FILENO);
-        close(STDOUT_FILENO);
-        close(STDERR_FILENO);
+    /* zamknij wszystkie pliki otwarte - użycie opcji NR_OPEN to przesada, lecz działa */
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
 
-        /* przeadresuj deskryptory plików 0, 1, 2 na /dev/null */
-        open ("/dev/null", O_RDWR); /* stdin */
-        dup (0); /* stdout */
-        dup (0); /* stderror */
+    /* przeadresuj deskryptory plików 0, 1, 2 na /dev/null */
+    open ("/dev/null", O_RDWR); /* stdin */
+    dup (0); /* stdout */
+    dup (0); /* stderror */
 
-        /* tu należy wykonać czynności demona… */
-        
-        //sprawdzenie czy program powinien natychmiastowo obudzić demona
-        
-       if(signal(SIGINT, powiadamiam)==SIG_ERR){
-           syslog(LOG_ERR,"Błąd związany z wysyłaniem sygnału");
-           exit(EXIT_FAILURE);
-       }
+    /* tu należy wykonać czynności demona… */
+    
+    //sprawdzenie czy program powinien natychmiastowo obudzić demona
+    
+    if(signal(SIGINT, powiadamiam)==SIG_ERR){
+        syslog(LOG_ERR,"Błąd związany z wysyłaniem sygnału");
+        exit(EXIT_FAILURE);
+    }
 
 
-        //wykonywanie operacji na katalogach i czekanie
-       while(1){
-           syslog(LOG_NOTICE, "Demon się budzi! (Buka tu jest)");
+    //wykonywanie operacji na katalogach i czekanie
+    while(1){
+        syslog(LOG_NOTICE, "Demon się budzi! (Buka tu jest)");
 
-           syslog(LOG_NOTICE, "Demon idzie spać! (Buka tu wróci)");
-           sleep(czas);
-
-       }
-        
+        syslog(LOG_NOTICE, "Demon idzie spać! (Buka tu wróci)");
+        sleep(czas);
 
     }
+
+}
+
+char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy)
+{
+    char* sciezka_pliku = malloc(strlen(sciezka_zrodlowa) + strlen(plik_tymczasowy) + 2 );
+    strcpy(sciezka_pliku,sciezka_zrodlowa);
+    strcat(sciezka_pliku,"/");
+    strcat(sciezka_pliku, plik_tymczasowy);
+    nowa_sciezka[strlen(sciezka_zrodlowa)+1+strlen(plik_tymczasowy)]='\0';
+    return sciezka_pliku;
+    
+}
+
+bool sprawdz_plik_zrodlowy(char* sciezka_pliku, char* sciezka_docelowa)
+{
+    bool czy_istnieje = false;
+    DIR* sciezka_pliku_docelowego;
+    
+}
+
+void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
+{
+     DIR* sciezka_zrodlowa = opendir(zrodlowa);
+     DIR* sciezka_docelowa = opendir(docelowa);
+
+     struct dirent* pliktymczasowy;
+     char* sciezka_pliku;
+
+     while(pliktymczasowy=readdir(sciezka_zrodlowa))
+     {
+         if(pliktymczasowy->d_type == DT_DIR)
+         {
+            //rekurencja
+         }
+         else
+         {
+            sciezka_pliku = plik_na_sciezke(sciezka_zrodlowa, pliktymczasowy);
+            if()
+                  
+
+         }
+     }
+}
 
 int main(int argc, char **argv)
 {
