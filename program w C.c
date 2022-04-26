@@ -72,6 +72,7 @@ void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
 
 char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy_nazwa)
 {
+    
     char* sciezka_pliku = malloc(strlen(sciezka_zrodlowa) + strlen(plik_tymczasowy_nazwa) + 2 );
     strcpy(sciezka_pliku,sciezka_zrodlowa);
     strcat(sciezka_pliku,"/");
@@ -90,6 +91,7 @@ time_t data_modyfikacji(char * pliczek)
 
 bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docelowa)
 {
+    syslog(LOG_NOTICE, "sprawdzanie pliku zrodlowego");
     bool czy_istnieje = false;
     DIR* sciezka_pliku_docelowego=opendir(sciezka_docelowa);
     struct dirent* plik_tymczasowy_docelowy;
@@ -128,7 +130,7 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
 void kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
 {
     //kopiowanie pliku jesli plik docelowy lub zamiana jesli plik juz istnieje
-    printf("kopiuj_plik");
+    syslog(LOG_NOTICE, "kopiowanie pliku");
     unsigned int rozmiar_bufora=32;
     FILE *plik_wejsciowy=fopen(plik_zrodlowy,"rb");
 	if(plik_wejsciowy==NULL)
@@ -174,6 +176,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
     {
         if((pliktymczasowy->d_type) == DT_REG)
         {
+            syslog(LOG_NOTICE, "znaleziono plik");
             sciezka_pliku = plik_na_sciezke(sciezka_zrodlowa, pliktymczasowy);
         if(sprawdz_plik_zrodlowy(pliktymczasowy,sciezka_docelowa)==false)
         {
@@ -189,6 +192,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
         //jesli plik jest folderem lub dowiazaniem nie robimy nic
         }
     }
+    syslog(LOG_NOTICE, "Koniec porownania");
 }
 
 int main(int argc, char **argv)
