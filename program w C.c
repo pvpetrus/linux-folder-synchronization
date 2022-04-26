@@ -132,6 +132,7 @@ time_t data_modyfikacji(char * pliczek)
 {
     struct stat czas;
     syslog(LOG_NOTICE,"data modyfikacji");
+    syslog(LOG_NOTICE,"pliczek: %s",pliczek);
     if(stat(pliczek, &czas) == -1)
     {
         syslog(LOG_ERR, "Blad z pobraniem daty modyfikacji dla pliku");
