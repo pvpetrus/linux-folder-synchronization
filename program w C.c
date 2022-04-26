@@ -231,7 +231,7 @@ void modyfikacja_czasu_i_dostepu(char * plik_wejsciowy, char* plik_wyjsciowy)
     }
     struct stat uprawnienia_modyfikacji;
     if(stat(plik_wejsciowy,&uprawnienia_modyfikacji)==-1){
-        syslog(LOG_ERR, "Nie mozna pobrac uprawnien")
+        syslog(LOG_ERR, "Nie mozna pobrac uprawnien");
     }
 
 
