@@ -219,7 +219,7 @@ int main(int argc, char **argv)
     //deklaracja zmiennych zaleznych od parametrow
     char *plik_zrodlowy;
     char *plik_docelowy;
-    int czas=300000;
+    int czas=3;
     bool rekurencja=NULL;
     //
     //kod na sprawdzenie parametrow
