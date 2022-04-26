@@ -176,7 +176,7 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
     return false;
 }
 
-void kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
+int kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
 {
     //kopiowanie pliku jesli plik docelowy lub zamiana jesli plik juz istnieje
     syslog(LOG_NOTICE, "kopiowanie pliku");
