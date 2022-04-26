@@ -122,6 +122,37 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
     }
 }
 
+void kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
+{
+    unsigned int rozmiar_bufora=32;
+    FILE *plik_wejsciowy=fopen(plik_zrodlowy,"rb");
+	if(plik_wejsciowy==NULL)
+	{
+		syslog(Log_ERR,"blad otwierania pliku wejsciowego");
+		return -1;
+	}
+	FILE *plik_wyjsciowy=fopen(plik_docelowy,"wb");
+	if(plik_wyjsciowy==NULL)
+	{
+		fclose(plik_wejsciowy);
+		syslog(Log_ERR,"blad otwierania pliku wyjsciowego");
+		return -1;
+	}
+	unsigned char *bufor=malloc(rozmiar_bufora);
+	while(1==1)
+	{
+	unsigned int czytaj_bity=fread(bufor,1,rozmiar_bufora,plik_wejsciowy);
+	fwrite(bufor,1,czytaj_bity,plik_wyjsciowy);
+	if(czytaj_bity<rozmiar_bufora)
+		break;
+	}
+	free(bufor);
+	fclose(plik_wejsciowy);
+	fclose(plik_wyjsciowy);
+
+    //dodac zmiane czasu i date modyfikacji zeby byla taka sama ale nie terazniejsza
+    
+}
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
 {
      DIR* sciezka_zrodlowa = opendir(zrodlowa);
@@ -138,7 +169,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
             if(sprawdz_plik_zrodlowy(pliktymczasowy,sciezka_docelowa)==false)
             {
                 //brakuje pliku i trzeba go skopiowac
-                kopiuj_plik();
+                kopiuj_plik(sciezka_pliku,docelowa);
             }
             
          }
@@ -268,15 +299,6 @@ int main(int argc, char **argv)
 
     //przywolanie demona
     openlog("Daemon", LOG_PID, LOG_DAEMON);
-
-
-    // if(daemon(0,0))
-    // {
-    //     printf("Demon dziala i to jak.");
-    // }
-    
-
-    //sleep(czas);
 
 
     ourDemon(plik_zrodlowy, plik_docelowy, czas, rekurencja);
