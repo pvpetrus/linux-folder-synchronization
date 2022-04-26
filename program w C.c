@@ -16,7 +16,7 @@
 
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa);
 void powiadamiam(int sig);
-void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja);
+int ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja);
 char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy_nazwa);
 time_t data_modyfikacji(char * pliczek);
 bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docelowa);
@@ -63,7 +63,7 @@ void powiadamiam(int sig)
     syslog(LOG_NOTICE, "Żądanie natychmiastowgo wybudzenia demona (SIGUSR1)");
 }
 
-void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
+int ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
     pid_t pid;
     pid = fork();
     if(pid==-1){
