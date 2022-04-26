@@ -221,7 +221,7 @@ int kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
 
 void modyfikacja_czasu_i_dostepu(char * plik_wejsciowy, char* plik_wyjsciowy)
 {
-    struct utimbuf czas_modyfikacji=NULL;
+    struct utimbuf czas_modyfikacji;
     czas_modyfikacji.actime=0;
     czas_modyfikacji.modtime=data_modyfikacji(plik_wejsciowy);
     if(utime(plik_wyjsciowy, &czas_modyfikacji) != 0)
