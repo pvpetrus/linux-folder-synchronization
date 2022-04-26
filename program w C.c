@@ -15,6 +15,8 @@
 #include <stdbool.h>
 #include <utime.h>
 
+void kopiuj_plik_mapowaniem(char *sciezka_pliku_zrodlowego,char *sciezka_pliku_docelowego);
+int rozmiar(char* sciezka_pliku);
 void modyfikacja_czasu_i_dostepu(char * plik_wejsciowy, char* plik_wyjsciowy);
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa);
 void powiadamiam(int sig);
@@ -35,6 +37,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
     DIR* sciezka_docelowa = opendir(docelowa);
     //tu trzeba dac pobieranie pelnej sciezki bo inaczej jest dziadostwo ^^^^^^^ ale dziaa
 
+    int maksymalny_rozmiar_pliku=5000;
     struct dirent* pliktymczasowy;
     char* sciezka_pliku;
     // przejscie po wszystkich plikach i folderach w folderze wejsciowym
@@ -49,7 +52,14 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
             {
                 syslog(LOG_NOTICE, "Należy skopiować plik");
                 //brakuje pliku i trzeba go skopiowac
+                if(rozmiar(sciezka_pliku)>rozmiar_pliku)
+                {
+                    kopiuj_plik_mapowaniem(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name));
+                }
+                else
+                {
                 kopiuj_plik(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name));
+                }
             }
         
         }
@@ -63,6 +73,23 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
     syslog(LOG_NOTICE, "Koniec porownania");
 }
 
+int rozmiar(char *sciezka_pliku_wejsciowego)
+{
+    syslog(LOG_NOTICE,"pobieranie rozmiaru");
+    struct stat rozmiar_pliku;
+    if(stat(sciezka_pliku_wejsciowego, &rozmiar_pliku)!=0)
+    {
+        syslog(LOG_ERR,"Nie mozna pobrac rozmiaru pliku");
+        exit(EXIT_FAILURE);
+        return -1;
+    }
+    return rozmiar.st_size;
+}
+void kopiuj_plik_mapowaniem(char *sciezka_pliku_zrodlowego,char *sciezka_pliku_docelowego)
+{
+    syslog(LOG_NOTICE,"kopiowanie przez mapowanie");
+    
+}
 void powiadamiam(int sig)
 {
     syslog(LOG_NOTICE, "Żądanie natychmiastowgo wybudzenia demona (SIGUSR1)");
