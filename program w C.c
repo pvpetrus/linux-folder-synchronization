@@ -62,7 +62,8 @@ void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
     //wykonywanie operacji na katalogach i czekanie
     while(1){
         syslog(LOG_NOTICE, "Demon się budzi! (Buka tu jest)");
-
+        syslog(LOG_NOTICE, "XYZ");
+        porownaj_zrodlowy(plik_zr, plik_doc);
         syslog(LOG_NOTICE, "Demon idzie spać! (Buka tu wróci)");
         sleep(czas);
 
@@ -70,13 +71,13 @@ void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
 
 }
 
-char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy)
+char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy_nazwa)
 {
-    char* sciezka_pliku = malloc(strlen(sciezka_zrodlowa) + strlen(plik_tymczasowy) + 2 );
+    char* sciezka_pliku = malloc(strlen(sciezka_zrodlowa) + strlen(plik_tymczasowy_nazwa) + 2 );
     strcpy(sciezka_pliku,sciezka_zrodlowa);
     strcat(sciezka_pliku,"/");
-    strcat(sciezka_pliku, plik_tymczasowy);
-    nowa_sciezka[strlen(sciezka_zrodlowa)+1+strlen(plik_tymczasowy)]='\0';
+    strcat(sciezka_pliku, plik_tymczasowy_nazwa);
+    sciezka_pliku[strlen(sciezka_zrodlowa)+1+strlen(plik_tymczasowy_nazwa)]='\0';
     return sciezka_pliku;
     
 }
@@ -98,9 +99,9 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
 
     while(plik_tymczasowy_docelowy=readdir(sciezka_pliku_docelowego))
     {
-        if(strcmp(plik->d_name,readdir(sciezka_pliku_tymczasowego))==0)
+        if(strcmp(plik_tymczasowy_docelowy->d_name,readdir(sciezka_pliku_tymczasowego))==0)
         {
-            if((plik->d_Type)==DT_REG)
+            if((plik_tymczasowy_docelowy->d_type)==DT_REG)
             {
                 roznica_czasu=(int)data_modyfikacji(sciezka_pliku_tymczasowego)-
                 (int)data_modyfikacji(plik_na_sciezke(sciezka_docelowa, 
@@ -116,10 +117,12 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
             else
             {
                 //jesli plik jest dowiazaniem lub folderem nie robimy nic
-                return 0;
+                return true;
             }
         }
     }
+
+    return false;
 }
 
 void kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
@@ -128,14 +131,14 @@ void kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
     FILE *plik_wejsciowy=fopen(plik_zrodlowy,"rb");
 	if(plik_wejsciowy==NULL)
 	{
-		syslog(Log_ERR,"blad otwierania pliku wejsciowego");
+		syslog(LOG_ERR,"blad otwierania pliku wejsciowego");
 		return -1;
 	}
 	FILE *plik_wyjsciowy=fopen(plik_docelowy,"wb");
 	if(plik_wyjsciowy==NULL)
 	{
 		fclose(plik_wejsciowy);
-		syslog(Log_ERR,"blad otwierania pliku wyjsciowego");
+		syslog(LOG_ERR,"blad otwierania pliku wyjsciowego");
 		return -1;
 	}
 	unsigned char *bufor=malloc(rozmiar_bufora);
@@ -150,11 +153,13 @@ void kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
 	fclose(plik_wejsciowy);
 	fclose(plik_wyjsciowy);
 
+    syslog(LOG_INFO, "Zmodyfikowano/utworzono plik");
     //dodac zmiane czasu i date modyfikacji zeby byla taka sama ale nie terazniejsza
     
 }
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
 {
+    syslog(LOG_INFO, "Poczatek porownannia");
      DIR* sciezka_zrodlowa = opendir(zrodlowa);
      DIR* sciezka_docelowa = opendir(docelowa);
 
@@ -168,8 +173,9 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
              sciezka_pliku = plik_na_sciezke(sciezka_zrodlowa, pliktymczasowy);
             if(sprawdz_plik_zrodlowy(pliktymczasowy,sciezka_docelowa)==false)
             {
+                syslog(LOG_INFO, "Należy skopiować plik");
                 //brakuje pliku i trzeba go skopiowac
-                kopiuj_plik(sciezka_pliku,docelowa);
+                kopiuj_plik(sciezka_pliku,plik_na_sciezke(sciezka_docelowa, pliktymczasowy->d_name));
             }
             
          }
