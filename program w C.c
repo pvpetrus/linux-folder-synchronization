@@ -14,6 +14,50 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+void porownaj_zrodlowy(char *zrodlowa, char *docelowa);
+void powiadamiam(int sig);
+void ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja);
+char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy_nazwa);
+time_t data_modyfikacji(char * pliczek);
+bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docelowa);
+void kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy);
+
+void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
+{
+    syslog(LOG_NOTICE, "Poczatek porownania");
+    printf("porownaj_zrodlowy");
+
+    DIR* sciezka_zrodlowa = opendir(zrodlowa);
+    DIR* sciezka_docelowa = opendir(docelowa);
+
+    struct dirent* pliktymczasowy;
+    char* sciezka_pliku;
+    // przejscie po wszystkich plikach i folderach w folderze wejsciowym
+    while(pliktymczasowy=readdir(sciezka_zrodlowa))
+    {
+        if((pliktymczasowy->d_type) == DT_REG)
+        {
+            syslog(LOG_NOTICE, "znaleziono plik");
+
+            sciezka_pliku = plik_na_sciezke(zrodlowa, (pliktymczasowy->d_name));
+            if(sprawdz_plik_zrodlowy(pliktymczasowy->d_name,docelowa)==false)
+            {
+                syslog(LOG_NOTICE, "Należy skopiować plik");
+                //brakuje pliku i trzeba go skopiowac
+                kopiuj_plik(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name));
+            }
+        
+        }
+        else
+        {
+            syslog(LOG_NOTICE, "ni znaleziono pliku");
+        //rekurencja
+        //jesli plik jest folderem lub dowiazaniem nie robimy nic
+        }
+    }
+    syslog(LOG_NOTICE, "Koniec porownania");
+}
+
 void powiadamiam(int sig)
 {
     syslog(LOG_NOTICE, "Żądanie natychmiastowgo wybudzenia demona (SIGUSR1)");
@@ -166,41 +210,7 @@ void kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
     //dodac zmiane czasu i date modyfikacji zeby byla taka sama ale nie terazniejsza
     
 }
-void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
-{
-    syslog(LOG_NOTICE, "Poczatek porownania");
-    printf("porownaj_zrodlowy");
 
-    DIR* sciezka_zrodlowa = opendir(zrodlowa);
-    DIR* sciezka_docelowa = opendir(docelowa);
-
-    struct dirent* pliktymczasowy;
-    char* sciezka_pliku;
-    // przejscie po wszystkich plikach i folderach w folderze wejsciowym
-    while(pliktymczasowy=readdir(sciezka_zrodlowa))
-    {
-        if((pliktymczasowy->d_type) == DT_REG)
-        {
-            syslog(LOG_NOTICE, "znaleziono plik");
-
-            sciezka_pliku = plik_na_sciezke(zrodlowa, (pliktymczasowy->d_name));
-            if(sprawdz_plik_zrodlowy(pliktymczasowy->d_name,docelowa)==false)
-            {
-                syslog(LOG_NOTICE, "Należy skopiować plik");
-                //brakuje pliku i trzeba go skopiowac
-                kopiuj_plik(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name));
-            }
-        
-        }
-        else
-        {
-            syslog(LOG_NOTICE, "ni znaleziono pliku");
-        //rekurencja
-        //jesli plik jest folderem lub dowiazaniem nie robimy nic
-        }
-    }
-    syslog(LOG_NOTICE, "Koniec porownania");
-}
 
 int main(int argc, char **argv)
 {
