@@ -27,17 +27,10 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
     syslog(LOG_NOTICE, "Poczatek porownania");
     printf("porownaj_zrodlowy");
     syslog(LOG_NOTICE, "zrodlowa: %s", zrodlowa);
-    char * pointer;
-
-    char* sciezka_zrodla = malloc(sizeof(char) * PATH_MAX);
-    char* sciezka_docelu = malloc(sizeof(char) * PATH_MAX);
-    pointer=realpath(zrodlowa, sciezka_zrodla);
-    syslog(LOG_NOTICE,"sciezka_zrodla: %s", pointer);
-    DIR* sciezka_zrodlowa = opendir(pointer);
-
-    pointer=realpath(docelowa, sciezka_docelu);
-    syslog(LOG_NOTICE,"sciezka_docelu: %s", pointer);
-    DIR* sciezka_docelowa = opendir(pointer);
+    syslog(LOG_NOTICE,"sciezka_zrodla: %s", zrodlowa);
+    DIR* sciezka_zrodlowa = opendir(zrodlowa);
+    syslog(LOG_NOTICE,"sciezka_docelu: %s", docelowa);
+    DIR* sciezka_docelowa = opendir(docelowa);
 
     struct dirent* pliktymczasowy;
     char* sciezka_pliku;
