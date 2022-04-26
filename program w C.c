@@ -151,8 +151,10 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
     {
         if(strcmp(plik_tymczasowy_docelowy->d_name,sciezka_pliku_tymczasowego)==0)
         {
+            free(sciezka_pliku_tymczasowego);
             if((plik_tymczasowy_docelowy->d_type)==DT_REG)
             {
+
                 roznica_czasu=(int)data_modyfikacji(sciezka_pliku_tymczasowego)-
                 (int)data_modyfikacji(plik_na_sciezke(sciezka_docelowa, 
                 plik_tymczasowy_docelowy->d_name));
