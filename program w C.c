@@ -26,9 +26,14 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
 {
     syslog(LOG_NOTICE, "Poczatek porownania");
     printf("porownaj_zrodlowy");
+    syslog(LOG_NOTICE, "zrodlowa: %s", zrodlowa);
 
-    DIR* sciezka_zrodlowa = opendir(zrodlowa);
-    DIR* sciezka_docelowa = opendir(docelowa);
+    char actualpath [PATH_MAX+1];
+    char * ptr = realpath(zrodlowa, actualpath);
+    DIR* sciezka_zrodlowa = opendir(ptr);
+
+    ptr = realpath(docelowa, actualpath);
+    DIR* sciezka_docelowa = opendir(ptr);
 
     struct dirent* pliktymczasowy;
     char* sciezka_pliku;
