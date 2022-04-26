@@ -13,6 +13,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <utime.h>
 
 void modyfikacja_czasu_i_dostepu(char * plik_wejsciowy, char* plik_wyjsciowy);
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa);
