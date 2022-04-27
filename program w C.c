@@ -85,14 +85,10 @@ bool sprawdz_plik_docelowy(char* sciezka_pliku_tymczasowego, char* sciezka_zrodl
 void porownaj_docelowy(char *zrodlowa, char *docelowa)
 {
     syslog(LOG_NOTICE, "Poczatek porownania do usuwania");
-    syslog(LOG_NOTICE, "zrodlowa: %s", zrodlowa);
-    syslog(LOG_NOTICE,"sciezka_zrodla: %s", zrodlowa);
-    DIR* sciezka_zrodlowa = opendir(zrodlowa);
     syslog(LOG_NOTICE,"sciezka_docelu: %s", docelowa);
     DIR* sciezka_docelowa = opendir(docelowa);
     //tu trzeba dac pobieranie pelnej sciezki bo inaczej jest dziadostwo ^^^^^^^ ale dziaa
 
-    int maksymalny_rozmiar_pliku=5000;
     struct dirent* pliktymczasowy;
     char* sciezka_pliku;
     int rozmiar_pliku;
@@ -107,7 +103,6 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
             if(sprawdz_plik_docelowy(zrodlowa,sciezka_pliku)==false)
             {
                 syslog(LOG_NOTICE, "Należy usunac plik");
-                rozmiar_pliku=rozmiar(sciezka_pliku);
                 usun_plik(sciezka_pliku);
             }
         
@@ -120,6 +115,7 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
         }
     }
     syslog(LOG_NOTICE, "Koniec porownania");
+    closedir(sciezka_docelowa);
 }
 
 
