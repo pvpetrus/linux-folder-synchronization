@@ -102,7 +102,7 @@ int kopiuj_plik_mapowaniem(char *sciezka_pliku_zrodlowego,char *sciezka_pliku_do
 		syslog(LOG_ERR, "blad otwarcia pliku");
         exit(EXIT_FAILURE);
 	}
-    char *mapa_pliku= (char*) mmap (0,rozmiar_pliku, PROT_READ, MAP_SHARED | MAP_FILE, plikwej, 0);
+    char *mapa_pliku= (char*) mmap (0,rozmiar_pliku, PROT_READ, MAP_SHARED | MAP_FILE, plik_zrodlowy, 0);
 
     write(plik_docelowy,mapa_pliku,rozmiar_pliku);
     modyfikacja_czasu_i_dostepu(sciezka_pliku_zrodlowego,sciezka_pliku_docelowego);
