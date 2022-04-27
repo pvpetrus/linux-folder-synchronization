@@ -301,7 +301,7 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
 
     int roznica_czasu=0;
     // przejscie po wszystkich plikach i folderach w folderze wyjsciowym
-    while(plik_tymczasowy_docelowy=readdir(sciezka_pliku_tymczasowego))
+    while(plik_tymczasowy_docelowy=readdir(sciezka_pliku_docelowego))
     {
         if(strcmp(plik_tymczasowy_docelowy->d_name,sciezka_pliku_tymczasowego)==0)
         {
