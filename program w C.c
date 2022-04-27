@@ -30,7 +30,14 @@ bool sprawdz_plik_docelowy(char* sciezka_pliku_tymczasowego, char* sciezka_zrodl
 int usun_plik(char* plik_docelowy);
 
 
-
+char *podmien(char * sciezka1, char* sciezka_folderu1, char* sciezka_folderu2)
+{
+    char*sciezka=sciezka1+strlen(sciezka_folderu2);
+    char * nowa_sciezka= malloc(strlen(sciezka_folderu1)+strlen(sciezka)+1);
+    strcpy(nowa_sciezka,sciezka_folderu1);
+    strcat(nowa_sciezka,sciezka);
+    return nowa_sciezka;
+}
 
 
 
@@ -105,7 +112,7 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
                 syslog(LOG_NOTICE, "Należy usunac plik");
                 usun_plik(sciezka_pliku);
             }*/
-            if(access(sciezka_pliku,zrodlowa,docelowa,F_OK)==-1)
+            if(access(podmien(sciezka_pliku,zrodlowa,docelowa),F_OK)==-1)
             {
                 syslog(LOG_NOTICE, "Należy usunac plik");
                 usun_plik(sciezka_pliku);
