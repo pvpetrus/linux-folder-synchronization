@@ -48,13 +48,13 @@ bool sprawdz_plik_docelowy(char* sciezka_pliku_tymczasowego, char* sciezka_zrodl
     // przejscie po wszystkich plikach i folderach w folderze wyjsciowym
     while(plik_tymczasowy_zrodlowy=readdir(sciezka_pliku_zrodlowego))
     {
-        if(strcmp(plik_tymczasowy_zrodlowy->d_name,sciezka_pliku_docelowego)==0)
+        if(strcmp(plik_tymczasowy_zrodlowy->d_name,sciezka_pliku_tymczasowego)==0)
         {
             
             if((plik_tymczasowy_zrodlowy->d_type)==DT_REG)
             {
 
-                roznica_czasu=(int)data_modyfikacji(sciezka_pliku_docelowego)-
+                roznica_czasu=(int)data_modyfikacji(sciezka_pliku_tymczasowego)-
                 (int)data_modyfikacji(plik_na_sciezke(sciezka_zrodlowa, 
                 plik_tymczasowy_zrodlowy->d_name));
                 //jesli data modyfikacji plikow rozni sie to nalezy plik docelowy zamienic
