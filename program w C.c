@@ -100,7 +100,12 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
             syslog(LOG_NOTICE, "znaleziono plik");
 
             sciezka_pliku = plik_na_sciezke(docelowa, (pliktymczasowy->d_name));
-            if(sprawdz_plik_docelowy(sciezka_pliku,zrodlowa)==false)
+            /*if(sprawdz_plik_docelowy(sciezka_pliku,zrodlowa)==false)
+            {
+                syslog(LOG_NOTICE, "Należy usunac plik");
+                usun_plik(sciezka_pliku);
+            }*/
+            if(access(sciezka_pliku,zrodlowa,docelowa,F_OK)==-1)
             {
                 syslog(LOG_NOTICE, "Należy usunac plik");
                 usun_plik(sciezka_pliku);
