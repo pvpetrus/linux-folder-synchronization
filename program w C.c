@@ -258,7 +258,7 @@ int ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
     while(1){
         syslog(LOG_NOTICE, "Demon się budzi! (Buka tu jest)");
         porownaj_zrodlowy(plik_zr, plik_doc);
-        //porownaj_docelowy(plik_zr,plik_doc);
+        porownaj_docelowy(plik_zr,plik_doc);
         syslog(LOG_NOTICE, "Demon idzie spać! (Buka tu wróci)");
         
         sleep(czas);
