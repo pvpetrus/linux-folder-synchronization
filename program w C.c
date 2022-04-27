@@ -31,6 +31,11 @@ int usun_plik(char* plik_docelowy);
 
 
 
+
+
+
+
+
 int usun_plik(char* plik_docelowy)
 {
     syslog(LOG_NOTICE, "sprawdzanie pliku docelowego");
@@ -77,11 +82,6 @@ bool sprawdz_plik_docelowy(char* sciezka_pliku_tymczasowego, char* sciezka_zrodl
     return false;
 }
 
-
-
-
-
-
 void porownaj_docelowy(char *zrodlowa, char *docelowa)
 {
     syslog(LOG_NOTICE, "Poczatek porownania do usuwania");
@@ -103,12 +103,12 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
         {
             syslog(LOG_NOTICE, "znaleziono plik");
 
-            sciezka_pliku = plik_na_sciezke(zrodlowa, (pliktymczasowy->d_name));
+            sciezka_pliku = plik_na_sciezke(docelowa, (pliktymczasowy->d_name));
             if(sprawdz_plik_docelowy(zrodlowa,sciezka_pliku)==false)
             {
                 syslog(LOG_NOTICE, "Należy usunac plik");
                 rozmiar_pliku=rozmiar(sciezka_pliku);
-                usun_plik(plik_na_sciezke(docelowa, pliktymczasowy->d_name));
+                usun_plik(sciezka_pliku);
             }
         
         }
