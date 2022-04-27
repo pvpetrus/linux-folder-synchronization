@@ -33,6 +33,7 @@ int usun_plik(char* plik_docelowy);
 
 int usun_plik(char* plik_docelowy)
 {
+    syslog(LOG_NOTICE, "usuwanie pliku");
     remove(plik_docelowy);
 }
 
