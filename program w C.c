@@ -23,21 +23,21 @@ void powiadamiam(int sig);
 int ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja);
 char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy_nazwa);
 time_t data_modyfikacji(char * pliczek);
-bool sprawdz_plik_zrodlowy(char* sciezka_pliku_zrodlowego, char* sciezka_docelowa);
+bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docelowa);
 int kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy);
 void porownaj_docelowy(char *zrodlowa, char *docelowa);
-bool sprawdz_plik_docelowy(char* sciezka_pliku_zrodlowego, char* sciezka_docelowa);
+bool sprawdz_plik_docelowy(char* sciezka_pliku_tymczasowego, char* sciezka_zrodlowa);
 int usun_plik(char* plik_docelowy);
 
 
 
 int usun_plik(char* plik_docelowy)
 {
-    syslog(LOG_NOTICE, "usuwanie pliku");
+    syslog(LOG_NOTICE, "sprawdzanie pliku docelowego");
     remove(plik_docelowy);
 }
 
-bool sprawdz_plik_docelowy(char* sciezka_zrodlowa, char* sciezka_pliku_docelowego)
+bool sprawdz_plik_docelowy(char* sciezka_pliku_tymczasowego, char* sciezka_zrodlowa)
 {
     syslog(LOG_NOTICE, "sprawdzanie pliku docelowego");
     bool czy_istnieje = false;
@@ -292,7 +292,7 @@ time_t data_modyfikacji(char * pliczek)
     return czas.st_mtime;
 }
 
-bool sprawdz_plik_zrodlowy(char* sciezka_pliku_zrodlowego, char* sciezka_docelowa)
+bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docelowa)
 {
     syslog(LOG_NOTICE, "sprawdzanie pliku zrodlowego");
     bool czy_istnieje = false;
@@ -301,15 +301,15 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_zrodlowego, char* sciezka_docelow
 
     int roznica_czasu=0;
     // przejscie po wszystkich plikach i folderach w folderze wyjsciowym
-    while(plik_tymczasowy_docelowy=readdir(sciezka_pliku_docelowego))
+    while(plik_tymczasowy_docelowy=readdir(sciezka_pliku_tymczasowego))
     {
-        if(strcmp(plik_tymczasowy_docelowy->d_name,sciezka_pliku_zrodlowego)==0)
+        if(strcmp(plik_tymczasowy_docelowy->d_name,sciezka_pliku_tymczasowego)==0)
         {
             
             if((plik_tymczasowy_docelowy->d_type)==DT_REG)
             {
 
-                roznica_czasu=(int)data_modyfikacji(sciezka_pliku_zrodlowego)-
+                roznica_czasu=(int)data_modyfikacji(sciezka_pliku_tymczasowego)-
                 (int)data_modyfikacji(plik_na_sciezke(sciezka_docelowa, 
                 plik_tymczasowy_docelowy->d_name));
                 //jesli data modyfikacji plikow rozni sie to nalezy plik docelowy zamienic
