@@ -125,7 +125,7 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
 
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
 {
-    syslog(LOG_NOTICE, "Poczatek porownania do kopiowania");
+    syslog(LOG_NOTICE, "Poczatek porownania");
     printf("porownaj_zrodlowy");
     syslog(LOG_NOTICE, "zrodlowa: %s", zrodlowa);
     syslog(LOG_NOTICE,"sciezka_zrodla: %s", zrodlowa);
@@ -137,7 +137,6 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
     int maksymalny_rozmiar_pliku=5000;
     struct dirent* pliktymczasowy;
     char* sciezka_pliku;
-    int rozmiar_pliku;
     // przejscie po wszystkich plikach i folderach w folderze wejsciowym
     while(pliktymczasowy=readdir(sciezka_zrodlowa))
     {
@@ -150,10 +149,9 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
             {
                 syslog(LOG_NOTICE, "Należy skopiować plik");
                 //brakuje pliku i trzeba go skopiowac
-                rozmiar_pliku=rozmiar(sciezka_pliku);
-                if(rozmiar_pliku>maksymalny_rozmiar_pliku)
+                if(rozmiar(sciezka_pliku)>rozmiar_pliku)
                 {
-                    kopiuj_plik_mapowaniem(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name),rozmiar_pliku);
+                    kopiuj_plik_mapowaniem(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name));
                 }
                 else
                 {
