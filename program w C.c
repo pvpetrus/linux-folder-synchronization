@@ -25,10 +25,106 @@ char* plik_na_sciezke(char* sciezka_zrodlowa, char* plik_tymczasowy_nazwa);
 time_t data_modyfikacji(char * pliczek);
 bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docelowa);
 int kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy);
+void porownaj_docelowy(char *zrodlowa, char *docelowa);
+bool sprawdz_plik_docelowy(char* sciezka_pliku_tymczasowego, char* sciezka_docelowa);
+int usun_plik(char* plik_docelowy);
+
+
+
+int usun_plik(char* plik_docelowy)
+{
+    remove(plik_docelowy);
+}
+
+bool sprawdz_plik_docelowy(char* sciezka_zrodlowa, char* sciezka_pliku_docelowego)
+{
+    syslog(LOG_NOTICE, "sprawdzanie pliku docelowego");
+    bool czy_istnieje = false;
+    DIR* sciezka_pliku_docelowego=opendir(sciezka_docelowa);
+    struct dirent* plik_tymczasowy_zrodlowy;
+
+    int roznica_czasu=0;
+    // przejscie po wszystkich plikach i folderach w folderze wyjsciowym
+    while(plik_tymczasowy_zrodlowy=readdir(sciezka_pliku_docelowego))
+    {
+        if(strcmp(plik_tymczasowy_zrodlowy->d_name,sciezka_pliku_docelowego)==0)
+        {
+            
+            if((plik_tymczasowy_zrodlowy->d_type)==DT_REG)
+            {
+
+                roznica_czasu=(int)data_modyfikacji(sciezka_pliku_docelowego)-
+                (int)data_modyfikacji(plik_na_sciezke(sciezka_zrodlowa, 
+                plik_tymczasowy_zrodlowy->d_name));
+                //jesli data modyfikacji plikow rozni sie to nalezy plik docelowy zamienic
+                if(roznica_czasu==0){
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                //jesli plik jest dowiazaniem lub folderem nie robimy nic
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+
+
+
+
+void porownaj_docelowy(char *zrodlowa, char *docelowa)
+{
+    syslog(LOG_NOTICE, "Poczatek porownania do usuwania");
+    syslog(LOG_NOTICE, "zrodlowa: %s", zrodlowa);
+    syslog(LOG_NOTICE,"sciezka_zrodla: %s", zrodlowa);
+    DIR* sciezka_zrodlowa = opendir(zrodlowa);
+    syslog(LOG_NOTICE,"sciezka_docelu: %s", docelowa);
+    DIR* sciezka_docelowa = opendir(docelowa);
+    //tu trzeba dac pobieranie pelnej sciezki bo inaczej jest dziadostwo ^^^^^^^ ale dziaa
+
+    int maksymalny_rozmiar_pliku=5000;
+    struct dirent* pliktymczasowy;
+    char* sciezka_pliku;
+    int rozmiar_pliku;
+    // przejscie po wszystkich plikach i folderach w folderze wejsciowym
+    while(pliktymczasowy=readdir(sciezka_docelowa))
+    {
+        if((pliktymczasowy->d_type) == DT_REG)
+        {
+            syslog(LOG_NOTICE, "znaleziono plik");
+
+            sciezka_pliku = plik_na_sciezke(zrodlowa, (pliktymczasowy->d_name));
+            if(sprawdz_plik_docelowy(zrodlowa,sciezka_pliku)==false)
+            {
+                syslog(LOG_NOTICE, "Należy usunac plik");
+                rozmiar_pliku=rozmiar(sciezka_pliku);
+                usun_plik(plik_na_sciezke(docelowa, pliktymczasowy->d_name));
+            }
+        
+        }
+        else
+        {
+            syslog(LOG_NOTICE, "ni znaleziono pliku");
+        //rekurencja
+        //jesli plik jest folderem lub dowiazaniem nie robimy nic
+        }
+    }
+    syslog(LOG_NOTICE, "Koniec porownania");
+}
+
 
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
 {
-    syslog(LOG_NOTICE, "Poczatek porownania");
+    syslog(LOG_NOTICE, "Poczatek porownania do kopiowania");
     printf("porownaj_zrodlowy");
     syslog(LOG_NOTICE, "zrodlowa: %s", zrodlowa);
     syslog(LOG_NOTICE,"sciezka_zrodla: %s", zrodlowa);
@@ -161,7 +257,9 @@ int ourDemon(char *plik_zr, char *plik_doc, int czas, char rekurencja){
     while(1){
         syslog(LOG_NOTICE, "Demon się budzi! (Buka tu jest)");
         porownaj_zrodlowy(plik_zr, plik_doc);
+        porownaj_docelowy(plik_zr,plik_doc);
         syslog(LOG_NOTICE, "Demon idzie spać! (Buka tu wróci)");
+        
         sleep(czas);
 
     }
