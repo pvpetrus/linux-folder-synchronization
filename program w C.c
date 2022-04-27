@@ -92,12 +92,12 @@ int kopiuj_plik_mapowaniem(char *sciezka_pliku_zrodlowego,char *sciezka_pliku_do
     syslog(LOG_NOTICE,"kopiowanie przez mapowanie");
     int plik_zrodlowy=open(sciezka_pliku_zrodlowego,O_RDONLY);
     int plik_docelowy=open(sciezka_pliku_docelowego,O_CREAT | O_WRONLY | O_CREAT | O_TRUNC , 0700);
-    if(plik_wejsciowy==-1)
+    if(plik_zrodlowy==-1)
 	{
 		syslog(LOG_ERR, "blad otwarcia pliku");
         exit(EXIT_FAILURE);
 	}
-    if(plik_wyjsciowy==-1)
+    if(plik_docelowy==-1)
 	{
 		syslog(LOG_ERR, "blad otwarcia pliku");
         exit(EXIT_FAILURE);
