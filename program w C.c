@@ -15,7 +15,7 @@
 #include <stdbool.h>
 #include <utime.h>
 
-void kopiuj_plik_mapowaniem(char *sciezka_pliku_zrodlowego,char *sciezka_pliku_docelowego);
+int kopiuj_plik_mapowaniem(char *sciezka_pliku_zrodlowego,char *sciezka_pliku_docelowego,int rozmiar_pliku);
 int rozmiar(char* sciezka_pliku);
 void modyfikacja_czasu_i_dostepu(char * plik_wejsciowy, char* plik_wyjsciowy);
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa);
@@ -40,6 +40,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
     int maksymalny_rozmiar_pliku=5000;
     struct dirent* pliktymczasowy;
     char* sciezka_pliku;
+    int rozmiar_pliku;
     // przejscie po wszystkich plikach i folderach w folderze wejsciowym
     while(pliktymczasowy=readdir(sciezka_zrodlowa))
     {
@@ -52,9 +53,10 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
             {
                 syslog(LOG_NOTICE, "Należy skopiować plik");
                 //brakuje pliku i trzeba go skopiowac
-                if(rozmiar(sciezka_pliku)>rozmiar_pliku)
+                rozmiar_pliku=rozmiar(sciezka_pliku);
+                if(rozmiar_pliku>maksymalny_rozmiar_pliku)
                 {
-                    kopiuj_plik_mapowaniem(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name));
+                    kopiuj_plik_mapowaniem(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name),rozmiar_pliku);
                 }
                 else
                 {
@@ -83,12 +85,32 @@ int rozmiar(char *sciezka_pliku_wejsciowego)
         exit(EXIT_FAILURE);
         return -1;
     }
-    return rozmiar.st_size;
+    return rozmiar_pliku.st_size;
 }
-void kopiuj_plik_mapowaniem(char *sciezka_pliku_zrodlowego,char *sciezka_pliku_docelowego)
+int kopiuj_plik_mapowaniem(char *sciezka_pliku_zrodlowego,char *sciezka_pliku_docelowego,int rozmiar_pliku)
 {
     syslog(LOG_NOTICE,"kopiowanie przez mapowanie");
-    
+    int plik_zrodlowy=open(sciezka_pliku_zrodlowego,O_RDONLY);
+    int plik_docelowy=open(sciezka_pliku_docelowego,O_CREAT | O_WRONLY | O_CREAT | O_TRUNC , 0700);
+    if(plik_wejsciowy==-1)
+	{
+		syslog(LOG_ERR, "blad otwarcia pliku");
+        exit(EXIT_FAILURE);
+	}
+    if(plik_wyjsciowy==-1)
+	{
+		syslog(LOG_ERR, "blad otwarcia pliku");
+        exit(EXIT_FAILURE);
+	}
+    char *mapa_pliku= (char*) mmap (0,rozmiar_pliku, PROT_READ, MAP_SHARED | MAP_FILE, plikwej, 0);
+
+    write(plik_docelowy,mapa_pliku,rozmiar_pliku);
+    modyfikacja_czasu_i_dostepu(sciezka_pliku_zrodlowego,sciezka_pliku_docelowego);
+    munmap(mapa_pliku,rozmiar_pliku);
+
+    syslog(LOG_NOTICE,"Skopiowano plik mapowaniem");
+    close(plik_docelowy);
+    close(plik_zrodlowy);
 }
 void powiadamiam(int sig)
 {
