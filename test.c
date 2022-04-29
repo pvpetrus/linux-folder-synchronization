@@ -41,7 +41,7 @@ char *podmien(char * sciezka1, char* sciezka_folderu1, char* sciezka_folderu2)
 
 int usun_plik(char* plik_docelowy)
 {
-    syslog(LOG_NOTICE, "sprawdzanie pliku docelowego");
+    syslog(LOG_NOTICE, "usuwanie pliku");
     remove(plik_docelowy);
 }
 
@@ -379,6 +379,7 @@ int kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
 {
     //kopiowanie pliku jesli plik docelowy lub zamiana jesli plik juz istnieje
     syslog(LOG_NOTICE, "kopiowanie pliku: %s" ,plik_zrodlowy);
+    syslog(LOG_NOTICE, "kopiowanie do pliku: %s" ,plik_docelowy);
     unsigned int rozmiar_bufora=32;
     FILE *plik_wejsciowy=fopen(plik_zrodlowy,"rb");
 	if(plik_wejsciowy==NULL)
