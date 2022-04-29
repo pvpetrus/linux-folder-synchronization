@@ -30,8 +30,13 @@ int kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy);
 void porownaj_docelowy(char *zrodlowa, char *docelowa);
 bool sprawdz_plik_docelowy(char* sciezka_pliku_tymczasowego, char* sciezka_zrodlowa);
 int usun_plik(char* plik_docelowy);
+int kopiuj_katalog(char * katalog_zrodlowy, char* katalog_docelowy);
 
+kopiuj_katalog(char * katalog_zrodlowy, char* katalog_docelowy)
+{
 
+	
+}
 char *podmien(char * sciezka1, char* sciezka_folderu1, char* sciezka_folderu2)
 {
     char*sciezka=sciezka1+strlen(sciezka_folderu2);
@@ -132,7 +137,7 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
                     sciezka_pliku = plik_na_sciezke(docelowa, (pliktymczasowy->d_name));
                     if(access(podmien(sciezka_pliku,zrodlowa,docelowa),F_OK)==-1)
                     {
-                        syslog(LOG_NOTICE, "Należy usunac plik");
+                        syslog(LOG_NOTICE, "Należy usunac folder");
                         usun_plik(sciezka_pliku);
                     }
                 }    
@@ -193,15 +198,8 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
                     }
                     else
                     {
-                        rozmiar_pliku=rozmiar(sciezka_pliku);
-                        if(rozmiar_pliku>maksymalny_rozmiar_pliku)
-                        {
-                            kopiuj_plik_mapowaniem(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name),rozmiar_pliku);
-                        }
-                        else
-                        {
-                            kopiuj_plik(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name));
-                        }
+                        mkdir(plik_na_sciezke(docelowa,(pliktymczasowy->d_name), 0700);
+			porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
                     }
                 }
         }
