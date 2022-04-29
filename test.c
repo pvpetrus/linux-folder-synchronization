@@ -189,11 +189,12 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
                     {
                         porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
                     }
+			/*
                     else
                     {
                         mkdir(plik_na_sciezke(docelowa,(pliktymczasowy->d_name)), 0700);
 			porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
-                    }
+                    }*/
                 }
         }
     }
