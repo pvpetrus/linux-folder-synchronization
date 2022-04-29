@@ -15,6 +15,8 @@
 #include <stdbool.h>
 #include <utime.h>
 
+bool rekurencja=false;
+
 int kopiuj_plik_mapowaniem(char *sciezka_pliku_zrodlowego,char *sciezka_pliku_docelowego,int rozmiar_pliku);
 int rozmiar(char* sciezka_pliku);
 void modyfikacja_czasu_i_dostepu(char * plik_wejsciowy, char* plik_wyjsciowy);
@@ -38,10 +40,6 @@ char *podmien(char * sciezka1, char* sciezka_folderu1, char* sciezka_folderu2)
     strcat(nowa_sciezka,sciezka);
     return nowa_sciezka;
 }
-
-
-
-
 
 int usun_plik(char* plik_docelowy)
 {
@@ -78,10 +76,22 @@ bool sprawdz_plik_docelowy(char* sciezka_pliku_tymczasowego, char* sciezka_zrodl
                     return false;
                 }
             }
-            else
+            else //folder rekurencyjnie
             {
-                //jesli plik jest dowiazaniem lub folderem nie robimy nic
-                return true;
+                if((pliktymczasowy->d_type) == DT_DIR && rekurencja==true ) //tu trzeba zmienic parametry
+                {
+                    roznica_czasu=(int)data_modyfikacji(sciezka_pliku_tymczasowego)-
+                    (int)data_modyfikacji(plik_na_sciezke(sciezka_zrodlowa, 
+                    plik_tymczasowy_zrodlowy->d_name));
+                    //jesli data modyfikacji plikow rozni sie to nalezy plik docelowy zamienic
+                    if(roznica_czasu==0){
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
             }
         }
     }
@@ -95,7 +105,7 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
     syslog(LOG_NOTICE,"sciezka_docelu: %s", docelowa);
     DIR* sciezka_docelowa = opendir(docelowa);
     //tu trzeba dac pobieranie pelnej sciezki bo inaczej jest dziadostwo ^^^^^^^ ale dziaa
-
+    int maksymalny_rozmiar_pliku=5000;
     struct dirent* pliktymczasowy;
     char* sciezka_pliku;
     int rozmiar_pliku;
@@ -107,11 +117,6 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
             syslog(LOG_NOTICE, "znaleziono plik");
 
             sciezka_pliku = plik_na_sciezke(docelowa, (pliktymczasowy->d_name));
-            /*if(sprawdz_plik_docelowy(sciezka_pliku,zrodlowa)==false)
-            {
-                syslog(LOG_NOTICE, "Należy usunac plik");
-                usun_plik(sciezka_pliku);
-            }*/
             if(access(podmien(sciezka_pliku,zrodlowa,docelowa),F_OK)==-1)
             {
                 syslog(LOG_NOTICE, "Należy usunac plik");
@@ -121,15 +126,21 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
         }
         else
         {
-            syslog(LOG_NOTICE, "ni znaleziono pliku");
-        //rekurencja
-        //jesli plik jest folderem lub dowiazaniem nie robimy nic
+            if((pliktymczasowy->d_type) == DT_DIR && rekurencja==true ) //tu trzeba zmienic parametry
+                {
+                    syslog(LOG_NOTICE, "znaleziono folder");
+                    sciezka_pliku = plik_na_sciezke(docelowa, (pliktymczasowy->d_name));
+                    if(access(podmien(sciezka_pliku,zrodlowa,docelowa),F_OK)==-1)
+                    {
+                        syslog(LOG_NOTICE, "Należy usunac plik");
+                        usun_plik(sciezka_pliku);
+                    }
+                }    
         }
     }
     syslog(LOG_NOTICE, "Koniec porownania");
     closedir(sciezka_docelowa);
 }
-
 
 void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
 {
@@ -165,16 +176,34 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
                 }
                 else
                 {
-                kopiuj_plik(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name));
+                    kopiuj_plik(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name));
                 }
             }
         
         }
-        else
+        else //katalog rekurencyjnie
         {
-            syslog(LOG_NOTICE, "ni znaleziono pliku");
-        //rekurencja
-        //jesli plik jest folderem lub dowiazaniem nie robimy nic
+                if((pliktymczasowy->d_type) == DT_DIR && rekurencja==true ) //tu trzeba zmienic parametry
+                {
+                    syslog(LOG_NOTICE, "znaleziono folder");
+                    sciezka_pliku=plik_na_sciezke(zrodlowa,(pliktymczasowy->d_name));
+                    if(&sprawdz_plik_zrodlowy(sciezka_pliku,docelowa)==true)
+                    {
+                        porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
+                    }
+                    else
+                    {
+                        rozmiar_pliku=rozmiar(sciezka_pliku);
+                        if(rozmiar_pliku>maksymalny_rozmiar_pliku)
+                        {
+                            kopiuj_plik_mapowaniem(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name),rozmiar_pliku);
+                        }
+                        else
+                        {
+                            kopiuj_plik(sciezka_pliku,plik_na_sciezke(docelowa, pliktymczasowy->d_name));
+                        }
+                    }
+                }
         }
     }
     syslog(LOG_NOTICE, "Koniec porownania");
@@ -192,6 +221,7 @@ int rozmiar(char *sciezka_pliku_wejsciowego)
     }
     return rozmiar_pliku.st_size;
 }
+
 int kopiuj_plik_mapowaniem(char *sciezka_pliku_zrodlowego,char *sciezka_pliku_docelowego,int rozmiar_pliku)
 {
     syslog(LOG_NOTICE,"kopiowanie przez mapowanie");
@@ -217,6 +247,7 @@ int kopiuj_plik_mapowaniem(char *sciezka_pliku_zrodlowego,char *sciezka_pliku_do
     close(plik_docelowy);
     close(plik_zrodlowy);
 }
+
 void powiadamiam(int sig)
 {
     syslog(LOG_NOTICE, "Żądanie natychmiastowgo wybudzenia demona (SIGUSR1)");
@@ -331,8 +362,20 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
             }
             else
             {
-                //jesli plik jest dowiazaniem lub folderem nie robimy nic
-                return true;
+                if((pliktymczasowy->d_type) == DT_DIR && rekurencja==true ) //tu trzeba zmienic parametry
+                {
+                    roznica_czasu=(int)data_modyfikacji(sciezka_pliku_tymczasowego)-
+                    (int)data_modyfikacji(plik_na_sciezke(sciezka_docelowa, 
+                    plik_tymczasowy_docelowy->d_name));
+                    //jesli data modyfikacji plikow rozni sie to nalezy plik docelowy zamienic
+                    if(roznica_czasu==0){
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
             }
         }
     }
@@ -405,7 +448,6 @@ int main(int argc, char **argv)
     char *plik_zrodlowy;
     char *plik_docelowy;
     int czas=3;
-    bool rekurencja=NULL;
     //
     //kod na sprawdzenie parametrow
     bool czy_parametry_poprawne=true;
