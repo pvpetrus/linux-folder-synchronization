@@ -189,7 +189,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
                     syslog(LOG_NOTICE, "kopiowanie sciezka_pliku: %s, plik_na_sciezke: %s",sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
                     if(sprawdz_plik_zrodlowy(sciezka_pliku,docelowa)==false)
                     {
-                        mkdir(plik_na_sciezke(docelowa,(pliktymczasowy->d_name)), 0777);
+                        mkdir(plik_na_sciezke(docelowa,(pliktymczasowy->d_name)), 0700);
                     }
                     porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
                 }
