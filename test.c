@@ -30,13 +30,6 @@ int kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy);
 void porownaj_docelowy(char *zrodlowa, char *docelowa);
 bool sprawdz_plik_docelowy(char* sciezka_pliku_tymczasowego, char* sciezka_zrodlowa);
 int usun_plik(char* plik_docelowy);
-int kopiuj_katalog(char * katalog_zrodlowy, char* katalog_docelowy);
-
-kopiuj_katalog(char * katalog_zrodlowy, char* katalog_docelowy)
-{
-
-	
-}
 char *podmien(char * sciezka1, char* sciezka_folderu1, char* sciezka_folderu2)
 {
     char*sciezka=sciezka1+strlen(sciezka_folderu2);
