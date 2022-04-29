@@ -133,7 +133,7 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
                             if(access(podmien(sciezka_pliku,zrodlowa,docelowa),F_OK)==-1)
                             {
                                 syslog(LOG_NOTICE, "Należy usunac folder");
-                                //porownaj_docelowy(plik_na_sciezke(zrodlowa, (pliktymczasowy->d_name)),sciezka_pliku);
+                                porownaj_docelowy(plik_na_sciezke(zrodlowa, (pliktymczasowy->d_name)),sciezka_pliku);
                                 usun_plik(sciezka_pliku);
                             }
                         }
