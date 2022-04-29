@@ -190,6 +190,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
                     if(sprawdz_plik_zrodlowy(sciezka_pliku,docelowa)==false)
                     {
                         mkdir(plik_na_sciezke(docelowa,(pliktymczasowy->d_name)), 0700);
+                        modyfikacja_czasu_i_dostepu(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
                     }
                     porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
                 }
