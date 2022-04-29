@@ -130,8 +130,8 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
                     sciezka_pliku = plik_na_sciezke(docelowa, (pliktymczasowy->d_name));
                     if(access(podmien(sciezka_pliku,zrodlowa,docelowa),F_OK)==-1)
                     {
-			syslog(LOG_NOTICE, "Należy usunac folder");
-			porownaj_docelowy(plik_na_sciezke(zrodlowa, (pliktymczasowy->d_name)),sciezka_pliku);
+                        syslog(LOG_NOTICE, "Należy usunac folder");
+                        porownaj_docelowy(plik_na_sciezke(zrodlowa, (pliktymczasowy->d_name)),sciezka_pliku);
                         usun_plik(sciezka_pliku);
                     }
                 }    
@@ -190,14 +190,12 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
                     {
                         porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
                     }
-			/*
                     else
                     {
                         mkdir(plik_na_sciezke(docelowa,(pliktymczasowy->d_name)), 0700);
-			porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
-                    }*/
+			            porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
+                    }
                 }
-        }
     }
     syslog(LOG_NOTICE, "Koniec porownania");
 }
@@ -379,7 +377,7 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
 int kopiuj_plik(char * plik_zrodlowy, char* plik_docelowy)
 {
     //kopiowanie pliku jesli plik docelowy lub zamiana jesli plik juz istnieje
-    syslog(LOG_NOTICE, "kopiowanie pliku");
+    syslog(LOG_NOTICE, "kopiowanie pliku: %s" ,plik_zrodlowy);
     unsigned int rozmiar_bufora=32;
     FILE *plik_wejsciowy=fopen(plik_zrodlowy,"rb");
 	if(plik_wejsciowy==NULL)
