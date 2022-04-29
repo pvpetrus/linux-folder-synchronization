@@ -78,7 +78,7 @@ bool sprawdz_plik_docelowy(char* sciezka_pliku_tymczasowego, char* sciezka_zrodl
             }
             else //folder rekurencyjnie
             {
-                if((pliktymczasowy->d_type) == DT_DIR && rekurencja==true ) //tu trzeba zmienic parametry
+                if((plik_tymczasowy_zrodlowy->d_type) == DT_DIR && rekurencja==true ) //tu trzeba zmienic parametry
                 {
                     roznica_czasu=(int)data_modyfikacji(sciezka_pliku_tymczasowego)-
                     (int)data_modyfikacji(plik_na_sciezke(sciezka_zrodlowa, 
@@ -187,7 +187,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
                 {
                     syslog(LOG_NOTICE, "znaleziono folder");
                     sciezka_pliku=plik_na_sciezke(zrodlowa,(pliktymczasowy->d_name));
-                    if(&sprawdz_plik_zrodlowy(sciezka_pliku,docelowa)==true)
+                    if(sprawdz_plik_zrodlowy(sciezka_pliku,docelowa)==true)
                     {
                         porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
                     }
@@ -362,7 +362,7 @@ bool sprawdz_plik_zrodlowy(char* sciezka_pliku_tymczasowego, char* sciezka_docel
             }
             else
             {
-                if((pliktymczasowy->d_type) == DT_DIR && rekurencja==true ) //tu trzeba zmienic parametry
+                if((plik_tymczasowy_docelowy->d_type) == DT_DIR && rekurencja==true ) //tu trzeba zmienic parametry
                 {
                     roznica_czasu=(int)data_modyfikacji(sciezka_pliku_tymczasowego)-
                     (int)data_modyfikacji(plik_na_sciezke(sciezka_docelowa, 
