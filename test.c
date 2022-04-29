@@ -146,10 +146,10 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
     syslog(LOG_NOTICE, "Poczatek porownania");
     printf("porownaj_zrodlowy");
     syslog(LOG_NOTICE, "zrodlowa: %s", zrodlowa);
-    syslog(LOG_NOTICE,"sciezka_zrodla: %s", zrodlowa);
     DIR* sciezka_zrodlowa = opendir(zrodlowa);
-    syslog(LOG_NOTICE,"sciezka_docelu: %s", docelowa);
+    syslog(LOG_NOTICE,"sciezka_zrodla: %s", sciezka_zrodlowa);
     DIR* sciezka_docelowa = opendir(docelowa);
+    syslog(LOG_NOTICE,"sciezka_docelu: %s", sciezka_docelowa);
     //tu trzeba dac pobieranie pelnej sciezki bo inaczej jest dziadostwo ^^^^^^^ ale dziaa
 
     int maksymalny_rozmiar_pliku=5000;
