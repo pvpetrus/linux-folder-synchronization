@@ -126,14 +126,17 @@ void porownaj_docelowy(char *zrodlowa, char *docelowa)
         {
             if((pliktymczasowy->d_type) == DT_DIR && rekurencja==true ) //tu trzeba zmienic parametry
                 {
-                    syslog(LOG_NOTICE, "znaleziono folder");
-                    sciezka_pliku = plik_na_sciezke(docelowa, (pliktymczasowy->d_name));
-                    if(access(podmien(sciezka_pliku,zrodlowa,docelowa),F_OK)==-1)
-                    {
-                        syslog(LOG_NOTICE, "Należy usunac folder");
-                        //porownaj_docelowy(plik_na_sciezke(zrodlowa, (pliktymczasowy->d_name)),sciezka_pliku);
-                        usun_plik(sciezka_pliku);
-                    }
+                    if( !( strcmp( plik->d_name, "." ) == 0 || strcmp( plik->d_name, "..") == 0 ) )
+                        {
+                            syslog(LOG_NOTICE, "znaleziono folder");
+                            sciezka_pliku = plik_na_sciezke(docelowa, (pliktymczasowy->d_name));
+                            if(access(podmien(sciezka_pliku,zrodlowa,docelowa),F_OK)==-1)
+                            {
+                                syslog(LOG_NOTICE, "Należy usunac folder");
+                                //porownaj_docelowy(plik_na_sciezke(zrodlowa, (pliktymczasowy->d_name)),sciezka_pliku);
+                                usun_plik(sciezka_pliku);
+                            }
+                        }
                 }    
         }
     }
@@ -156,6 +159,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
     struct dirent* pliktymczasowy;
     char* sciezka_pliku;
     int rozmiar_pliku;
+    char* sciezka_folderu_docelowego;
     // przejscie po wszystkich plikach i folderach w folderze wejsciowym
     while(pliktymczasowy=readdir(sciezka_zrodlowa))
     {
@@ -184,14 +188,18 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
         {
                 if((pliktymczasowy->d_type) == DT_DIR && rekurencja==true ) //tu trzeba zmienic parametry
                 {
-                    syslog(LOG_NOTICE, "znaleziono folder");
-                    sciezka_pliku=plik_na_sciezke(zrodlowa,(pliktymczasowy->d_name));
-                    syslog(LOG_NOTICE, "kopiowanie sciezka_pliku: %s, plik_na_sciezke: %s",sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
-                    if(sprawdz_plik_zrodlowy(sciezka_pliku,docelowa)==false)
+                    if( !( strcmp( plik->d_name, "." ) == 0 || strcmp( plik->d_name, "..") == 0 )
                     {
-                        mkdir(plik_na_sciezke(docelowa,(pliktymczasowy->d_name)), 0777);
+                        syslog(LOG_NOTICE, "znaleziono folder");
+                        sciezka_pliku=plik_na_sciezke(zrodlowa,(pliktymczasowy->d_name));
+                        sciezka_folderu_docelowego=plik_na_sciezke(docelowa,(pliktymczasowy->d_name));
+                        syslog(LOG_NOTICE, "kopiowanie sciezka_pliku: %s, plik_na_sciezke: %s",sciezka_pliku,sciezka_folderu_docelowego);
+                        if(sprawdz_plik_zrodlowy(sciezka_pliku,docelowa)==false)
+                        {
+                            mkdir(plik_na_sciezke(docelowa,(pliktymczasowy->d_name)), 0777);
+                        }
+                        porownaj_zrodlowy(sciezka_pliku,sciezka_folderu_docelowego);
                     }
-                    //porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
                 }
         }
     }
