@@ -196,6 +196,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
 			            porownaj_zrodlowy(sciezka_pliku,plik_na_sciezke(docelowa,(pliktymczasowy->d_name)));
                     }
                 }
+        }
     }
     syslog(LOG_NOTICE, "Koniec porownania");
 }
