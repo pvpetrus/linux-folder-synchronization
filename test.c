@@ -188,7 +188,7 @@ void porownaj_zrodlowy(char *zrodlowa, char *docelowa)
         {
                 if((pliktymczasowy->d_type) == DT_DIR && rekurencja==true ) //tu trzeba zmienic parametry
                 {
-                    if( !( strcmp( pliktymczasowy->d_name, "." ) == 0 || strcmp( pliktymczasowy->d_name, "..") == 0 )
+                    if( !( strcmp( pliktymczasowy->d_name, "." ) == 0 || strcmp( pliktymczasowy->d_name, "..") == 0 ) )
                     {
                         syslog(LOG_NOTICE, "znaleziono folder");
                         sciezka_pliku=plik_na_sciezke(zrodlowa,(pliktymczasowy->d_name));
